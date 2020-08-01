@@ -1,9 +1,24 @@
 # Computer Pointer Controller
-
-*TODO:* Write a short introduction to your project
+This is a computer vision application making use of a blend of several computer vision models. This app enables controlling a mouse pointer through the movement of the head and eyes.
+[Model Pipeline](./images/pipeline.png)
 
 ## Project Set Up and Installation
-*TODO:* Explain the setup procedures to run your project. For instance, this can include your project directory structure, the models you need to download and where to place them etc. Also include details about how to install the dependencies your project requires.
+- Install Intel® Distribution of OpenVINO™ toolkit. Guide to install on your platform [HERE](https://docs.openvinotoolkit.org/latest/)
+
+-  Create a virtual environment to work in and activate it:
+  ```python3 -m venv cpcenv```
+- cd to environment path and active it
+  ```cpcenv\Scripts\activate.bat```
+- set the openvino environment variable. (Since i'm using openvino 2020.1) 0n my windows it will be:
+```C:\Program Files (x86)\IntelSWTools\openvino_2020.1.033\bin\setupvars.bat```
+- Download models
+
+1. [Face Detection Model](https://docs.openvinotoolkit.org/latest/_models_intel_landmarks_regression_retail_0009_description_landmarks_regression_retail_0009.html)
+2. [Facial Landmarks Model](https://docs.openvinotoolkit.org/latest/_models_intel_gaze_estimation_adas_0002_description_gaze_estimation_adas_0002.html)
+3. [Head Pose Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_head_pose_estimation_adas_0001_description_head_pose_estimation_adas_0001.html)
+4. [Face Detection Model](https://docs.openvinotoolkit.org/latest/_models_intel_face_detection_adas_binary_0001_description_face_detection_adas_binary_0001.html)
+
+- 
 
 ## Demo
 *TODO:* Explain how to run a basic demo of your model.
