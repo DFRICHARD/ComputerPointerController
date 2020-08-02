@@ -37,7 +37,7 @@ class GazeEstimation:
             exit(1)
         self.exec_network = core.load_network(network=self.model, device_name=self.device, num_requests=1)
 
-    def predict(self, image, l_eye, r_eye, hp_angles):
+    def predict(self, image, l_eye, r_eye, hp_angles, viz):
         processed_right_eye = self.preprocess_input(r_eye)
         processed_left_eye = self.preprocess_input(l_eye)
         input_dict = {'head_pose_angles': hp_angles,'left_eye_image': processed_left_eye, 'right_eye_image': processed_right_eye}
@@ -46,7 +46,7 @@ class GazeEstimation:
         infer_status = infer_request_handle.wait()
         if infer_status == 0:
             outputs = infer_request_handle.outputs[self.output_name[0]]
-            mouse_coord, gaze_vector = self.preprocess_output(outputs, hp_angles)
+            mouse_coord, gaze_vector = self.preprocess_output(outputs, hp_angles, viz)
 
         return mouse_coord, gaze_vector
 
@@ -59,7 +59,7 @@ class GazeEstimation:
         p_frame = p_frame.reshape(1, *p_frame.shape)
         return p_frame
 
-    def preprocess_output(self, outputs, hp_angles):
+    def preprocess_output(self, outputs, hp_angles, viz):
         gaze_vector = outputs[0]
         angle_r_fc = hp_angles[2]
 

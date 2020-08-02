@@ -1,3 +1,4 @@
+from math import cos, sin, pi
 import os
 # import sys
 # import logging as log
@@ -35,10 +36,10 @@ class HeadPoseEstimation:
             exit(1)
         self.exec_network = core.load_network(network=self.model, device_name=self.device, num_requests=1)
 
-    def predict(self, image):
+    def predict(self, image, face_crop, points, viz):
         input_name = self.input_name
 
-        input_img = self.preprocess_input(image)
+        input_img = self.preprocess_input(face_crop)
 
         input_dict = {input_name: input_img}
 
@@ -46,9 +47,9 @@ class HeadPoseEstimation:
         infer_status = infer_request_handle.wait()
         if infer_status == 0:
             outputs = infer_request_handle.outputs
-            hp_angles = self.preprocess_output(outputs)
+            out_image, hp_angles = self.preprocess_output(image, outputs, points, viz)
 
-        return hp_angles
+        return out_image, hp_angles
 
     #def check_model(self):
 
@@ -59,7 +60,7 @@ class HeadPoseEstimation:
         p_frame = p_frame.reshape(1, *p_frame.shape)
         return p_frame
 
-    def preprocess_output(self, outputs):
+    def preprocess_output(self, image, outputs, points, viz):
 
         y = outputs['angle_y_fc'][0][0]
         p = outputs['angle_p_fc'][0][0]
@@ -67,9 +68,32 @@ class HeadPoseEstimation:
 
         angles = [y, p, r]
 
-        # if (display):
-        #     out_image = self.draw_outputs(image,  angles, face_coords)
-        return angles
+        if (viz):
+            # Face coordinates
+            xmin = points[0]
+            ymin = points[1]
+            xmax = points[2]
+            ymax = points[3]
+            # I took the below code from here:
+            # https://sudonull.com/post/6484-Intel-OpenVINO-on-Raspberry-Pi-2018-harvest
+            cos_r = cos(r * pi / 180)
+            sin_r = sin(r * pi / 180)
+            sin_y = sin(y * pi / 180)
+            cos_y = cos(y * pi / 180)
+            sin_p = sin(p * pi / 180)
+            cos_p = cos(p * pi / 180)
+
+            x = int((xmin + xmax) / 2)
+            y = int((ymin + ymax) / 2)
+
+            # Center to right
+            cv2.line(image, (x,y), (x+int(70*(cos_r*cos_y+sin_y*sin_p*sin_r)), y+int(70*cos_p*sin_r)), (128, 0, 128), 2)
+            # Center to top
+            cv2.line(image, (x, y), (x+int(70*(cos_r*sin_y*sin_p+cos_y*sin_r)), y-int(70*cos_p*cos_r)), (128, 0, 128), 2)
+            # Center to forward
+            cv2.line(image, (x, y), (x + int(70*sin_y*cos_p), y + int(70*sin_p)), (255, 0, 0), thickness=3)
+
+        return image, angles
 
 
 

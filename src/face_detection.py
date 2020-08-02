@@ -42,7 +42,7 @@ class FaceDetection:
             exit(1)
         self.exec_network = core.load_network(network=self.model, device_name=self.device, num_requests=1)
 
-    def predict(self, image):
+    def predict(self, image, viz):
         input_name = self.input_name
 
         input_img = self.preprocess_input(image)
@@ -53,12 +53,12 @@ class FaceDetection:
         infer_status = infer_request_handle.wait()
         if infer_status == 0:
             outputs = infer_request_handle.outputs[self.output_name]
-            face_crop, points = self.preprocess_output(outputs, image)
-            if len(points) == 0:
-                log.error("No Face is detected, Next frame will be processed..")
-                return 0, 0
+            out_image, face_crop, points = self.preprocess_output(outputs, image, viz)
+            # if len(points) == 0:
+            #     log.error("No Face is detected...")
+            #     return 0, 0, (0,0,0,0)
 
-        return face_crop, points
+        return out_image, face_crop, points
 
     # def check_model(self):
 
@@ -69,11 +69,12 @@ class FaceDetection:
         p_frame = p_frame.reshape(1, *p_frame.shape)
         return p_frame
 
-    def preprocess_output(self, outputs, image):
+
+    def preprocess_output(self, outputs, image, viz):
 
         points = []
         w, h = int(image.shape[1]), int(image.shape[0])
-        frame = image
+        frame_crop = image
 
         for box in outputs[0][0]:
             conf = box[2]
@@ -87,7 +88,9 @@ class FaceDetection:
                 points.append(xmax)
                 points.append(ymax)
 
-                frame = image[ymin:ymax, xmin:xmax]
-                # cv2.rectangle(image, (xmin, ymin),(xmax, ymax), (0, 255, 0), 3)
+                frame_crop = image[ymin:ymax, xmin:xmax]
 
-        return frame, points
+                if (viz):
+                    cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (128, 0, 128), 2)
+
+        return image, frame_crop, points
