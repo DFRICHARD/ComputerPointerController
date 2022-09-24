@@ -2,6 +2,7 @@ import os
 # import sys
 # import logging as log
 import cv2
+import numpy as np
 from openvino.inference_engine import IENetwork, IECore
 
 class FacialLandmarksDetection:
@@ -36,7 +37,7 @@ class FacialLandmarksDetection:
             exit(1)
         self.exec_network = core.load_network(network=self.model, device_name=self.device, num_requests=1)
 
-    def predict(self, image, face_crop, viz):
+    def predict(self, image, face_crop, face_coords, viz):
         input_name = self.input_name
 
         input_img = self.preprocess_input(face_crop)
@@ -47,9 +48,9 @@ class FacialLandmarksDetection:
         infer_status = infer_request_handle.wait()
         if infer_status == 0:
             outputs = infer_request_handle.outputs[self.output_name]
-            out_image, l_eye, r_eye, eye_coords = self.preprocess_output(outputs, face_crop, image, viz)
+            image_out, l_eye, r_eye, eye_coords = self.preprocess_output(outputs, face_crop, face_coords, image, viz)
 
-        return out_image, l_eye, r_eye, eye_coords
+        return image_out, l_eye, r_eye, eye_coords
 
     #def check_model(self):
 
@@ -61,29 +62,31 @@ class FacialLandmarksDetection:
         return p_frame
 
 
-    def preprocess_output(self, outputs, face_crop, image, viz):
+    def preprocess_output(self, outputs, face_crop, face_coords, image, viz):
         outputs = outputs[0]
         # left eye coordinates
-        l_eye_xmin = int(outputs[0][0][0] * face_crop.shape[1]) - 10
-        l_eye_xmax = int(outputs[0][0][0] * face_crop.shape[1]) + 10
-        l_eye_ymin = int(outputs[1][0][0] * face_crop.shape[0]) - 10
-        l_eye_ymax = int(outputs[1][0][0] * face_crop.shape[0]) + 10
+        l_eye_xmin = int((outputs[0][0][0] * face_crop.shape[1])+ face_coords[0]) - 20
+        l_eye_xmax = int((outputs[0][0][0] * face_crop.shape[1])+ face_coords[0]) + 20
+        l_eye_ymin = int((outputs[1][0][0] * face_crop.shape[0])+ face_coords[1]) - 20
+        l_eye_ymax = int((outputs[1][0][0] * face_crop.shape[0])+ face_coords[1]) + 20
 
         #right eye coordinates
-        r_eye_xmin = int(outputs[2][0][0] * face_crop.shape[1]) - 10
-        r_eye_xmax = int(outputs[2][0][0] * face_crop.shape[1]) + 10
-        r_eye_ymin = int(outputs[3][0][0] * face_crop.shape[0]) - 10
-        r_eye_ymax = int(outputs[3][0][0] * face_crop.shape[0]) + 10
+        r_eye_xmin = int((outputs[2][0][0] * face_crop.shape[1])+ face_coords[0]) - 20
+        r_eye_xmax = int((outputs[2][0][0] * face_crop.shape[1])+ face_coords[0]) + 20
+        r_eye_ymin = int((outputs[3][0][0] * face_crop.shape[0])+ face_coords[1]) - 20
+        r_eye_ymax = int((outputs[3][0][0] * face_crop.shape[0])+ face_coords[1]) + 20
 
-        l_eye = face_crop[l_eye_ymin:l_eye_ymax, l_eye_xmin:l_eye_xmax]
-        r_eye = face_crop[r_eye_ymin:r_eye_ymax, r_eye_xmin:r_eye_xmax]
+        image = np.copy(image)
+
+        l_eye = image[l_eye_ymin:l_eye_ymax, l_eye_xmin:l_eye_xmax]
+        r_eye = image[r_eye_ymin:r_eye_ymax, r_eye_xmin:r_eye_xmax]
         eye_coords = [[int(l_eye_xmin), int(l_eye_ymin), int(l_eye_xmax), int(l_eye_ymax)], [int(r_eye_xmin), int(r_eye_ymin), int(r_eye_xmax), int(r_eye_ymax)]]
 
         if (viz):
-            cv2.rectangle(face_crop, (l_eye_xmin, l_eye_ymin), (l_eye_xmax, l_eye_ymax), (128, 0, 128), 2)
-            cv2.rectangle(face_crop, (r_eye_xmin, r_eye_ymin), (r_eye_xmax, r_eye_ymax), (128, 0, 128), 2)
+            cv2.rectangle(image, (l_eye_xmin, l_eye_ymin), (l_eye_xmax, l_eye_ymax), (128, 0, 128), 3)
+            cv2.rectangle(image, (r_eye_xmin, r_eye_ymin), (r_eye_xmax, r_eye_ymax), (128, 0, 128), 3)
 
-        return face_crop, l_eye, r_eye, eye_coords
+        return image, l_eye, r_eye, eye_coords
 
 
 

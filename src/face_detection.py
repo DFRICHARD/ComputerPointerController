@@ -53,12 +53,12 @@ class FaceDetection:
         infer_status = infer_request_handle.wait()
         if infer_status == 0:
             outputs = infer_request_handle.outputs[self.output_name]
-            out_image, face_crop, points = self.preprocess_output(outputs, image, viz)
+            face_crop, points = self.preprocess_output(outputs, image, viz)
             # if len(points) == 0:
             #     log.error("No Face is detected...")
             #     return 0, 0, (0,0,0,0)
 
-        return out_image, face_crop, points
+        return face_crop, points
 
     # def check_model(self):
 
@@ -91,6 +91,6 @@ class FaceDetection:
                 frame_crop = image[ymin:ymax, xmin:xmax]
 
                 if (viz):
-                    cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (128, 0, 128), 2)
+                    cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (128, 0, 128), 4)
 
-        return image, frame_crop, points
+        return frame_crop, points

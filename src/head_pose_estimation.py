@@ -47,9 +47,9 @@ class HeadPoseEstimation:
         infer_status = infer_request_handle.wait()
         if infer_status == 0:
             outputs = infer_request_handle.outputs
-            out_image, hp_angles = self.preprocess_output(image, outputs, points, viz)
+            image_out, hp_angles = self.preprocess_output(image, outputs, points, viz)
 
-        return out_image, hp_angles
+        return image_out, hp_angles
 
     #def check_model(self):
 
@@ -87,11 +87,11 @@ class HeadPoseEstimation:
             y = int((ymin + ymax) / 2)
 
             # Center to right
-            cv2.line(image, (x,y), (x+int(70*(cos_r*cos_y+sin_y*sin_p*sin_r)), y+int(70*cos_p*sin_r)), (128, 0, 128), 2)
+            cv2.line(image, (x,y), (x+int(70*(cos_r*cos_y+sin_y*sin_p*sin_r)), y+int(70*cos_p*sin_r)), (0, 0, 255), 3)
             # Center to top
-            cv2.line(image, (x, y), (x+int(70*(cos_r*sin_y*sin_p+cos_y*sin_r)), y-int(70*cos_p*cos_r)), (128, 0, 128), 2)
+            cv2.line(image, (x, y), (x+int(70*(cos_r*sin_y*sin_p+cos_y*sin_r)), y-int(70*cos_p*cos_r)), (0, 255, 0), 3)
             # Center to forward
-            cv2.line(image, (x, y), (x + int(70*sin_y*cos_p), y + int(70*sin_p)), (255, 0, 0), thickness=3)
+            cv2.line(image, (x, y), (x + int(70*sin_y*cos_p), y + int(70*sin_p)), (255, 0, 0), 3)
 
         return image, angles
 
