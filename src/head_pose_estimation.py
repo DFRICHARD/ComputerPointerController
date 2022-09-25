@@ -1,6 +1,6 @@
 from math import cos, sin, pi
 import os
-# import sys
+import sys
 # import logging as log
 import cv2
 from openvino.inference_engine import IENetwork, IECore
@@ -33,7 +33,7 @@ class HeadPoseEstimation:
         if len(unsupported_layers) != 0:
             print("Unsupported layers found: {}".format(unsupported_layers))
             print("Check whether extensions are available to add to IECore.")
-            exit(1)
+            sys.exit(1)
         self.exec_network = core.load_network(network=self.model, device_name=self.device, num_requests=1)
 
     def predict(self, image, face_crop, points, viz):
