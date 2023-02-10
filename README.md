@@ -21,7 +21,7 @@ This is a computer vision application making use of a blend of several computer 
   ```cpcenv\Scripts\activate.bat```
 - Install necessary libraries
   ```pip install -r requirements.txt```
-- set the openvino environment variable. (Since i'm using openvino 2020.1, 0n my Windows PC it will be):
+- set the openvino environment variable. (Since i'm using openvino 2020.1, On my Windows PC it will be):
 ```C:\Program Files (x86)\IntelSWTools\openvino_2020.1.033\bin\setupvars.bat```
 - Download models
   ```
