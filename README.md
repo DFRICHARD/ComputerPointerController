@@ -1,5 +1,6 @@
 # Computer Pointer Controller
 This is a computer vision application making use of a blend of several computer vision models. This app enables controlling a mouse pointer through the movement of the head and eyes.
+
 ![Model data pipeline](./bin/image/pipeline.png)
 
 
@@ -51,6 +52,7 @@ python3 app.py -fd <project directory>/intel/face-detection-adas-binary-0001/FP3
 
 ## Documentation
 *TODO:* Include any documentation that users might need to better understand your project code. For instance, this is a good place to explain the command line arguments that your project supports.
+
 ![App arguments](./bin/image/args.png)
 
 
